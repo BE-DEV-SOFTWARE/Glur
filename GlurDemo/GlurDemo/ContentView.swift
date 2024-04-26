@@ -16,10 +16,19 @@ struct ContentView: View {
             
             TabView {
                 icon
+                    .tabItem {
+                        Label("Icon", systemImage: "star")
+                    }
+                
                 albumCover
+                    .tabItem {
+                        Label("Album", systemImage: "photo")
+                    }
             }
             #if os(iOS)
             .tabViewStyle(.page)
+            #else
+            .padding()
             #endif
             .padding(.vertical)
         }

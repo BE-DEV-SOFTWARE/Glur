@@ -7,22 +7,45 @@
 
 import SwiftUI
 
-public enum BlurDirection: Int {
-    case down = 0
-    case up = 1
-    case right = 2
-    case left = 3
+public enum BlurDirection {
+    case down
+    case up
+    case right
+    case left
     
-    var unitPoints: (UnitPoint, UnitPoint) {
+    // Evaluated based on the layout direction
+    case trailing
+    case leading
+    
+    enum Evaluated: Int {
+        case down = 0
+        case up = 1
+        case right = 2
+        case left = 3
+    }
+    
+    func evaluate(with direction: LayoutDirection) -> Evaluated {
         switch self {
         case .down:
-            return (.top, .bottom)
+            return .down
         case .up:
-            return (.bottom, .top)
+            return .up
         case .right:
-            return (.leading, .trailing)
+            return .right
         case .left:
-            return (.trailing, .leading)
+            return .left
+        case .trailing:
+            if direction == .leftToRight {
+                return .right
+            } else {
+                return .left
+            }
+        case .leading:
+            if direction == .leftToRight {
+                return .left
+            } else {
+                return .right
+            }
         }
     }
 }
