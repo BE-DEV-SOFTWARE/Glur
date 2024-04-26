@@ -24,7 +24,7 @@ public enum BlurDirection {
         case left = 3
     }
     
-    func evaluate(with direction: LayoutDirection) -> Evaluated {
+    public func evaluate(with direction: LayoutDirection) -> Evaluated {
         switch self {
         case .down:
             return .down
