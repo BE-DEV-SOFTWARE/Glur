@@ -17,7 +17,7 @@ public enum BlurDirection {
     case trailing
     case leading
     
-    enum Evaluated: Int {
+    public enum Evaluated: Int {
         case down = 0
         case up = 1
         case right = 2
