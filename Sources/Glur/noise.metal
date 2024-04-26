@@ -1,5 +1,5 @@
 //
-//  random.metal
+//  noise.metal
 //
 //
 //  Created by João Gabriel Pozzobon dos Santos on 24/04/24.
@@ -40,7 +40,7 @@ float rand(float2 st) {
                  43758.5453123);
 }
 
-[[ stitchable ]] half4 random(float2 position,
+[[ stitchable ]] half4 noise(float2 position,
                              SwiftUI::Layer layer,
                              float strength,
                              float offset,

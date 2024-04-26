@@ -45,8 +45,8 @@ internal struct GlurModifier: ViewModifier {
         return shader
     }
     
-    var randomShader: Shader {
-        var shader = library.random(.float(noise),
+    var noiseShader: Shader {
+        var shader = library.noise(.float(noise),
                                     .float(offset),
                                     .float(interpolation),
                                     .float(Float(evaluatedDirection.rawValue)),
@@ -69,7 +69,7 @@ internal struct GlurModifier: ViewModifier {
             }
             .layerEffect(blurX, maxSampleOffset: .zero)
             .layerEffect(blurY, maxSampleOffset: .zero)
-            .layerEffect(randomShader, maxSampleOffset: .zero)
+            .layerEffect(noiseShader, maxSampleOffset: .zero)
     }
 }
 

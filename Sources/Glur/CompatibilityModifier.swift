@@ -44,7 +44,7 @@ internal struct CompatibilityModifier: ViewModifier {
     }
 }
 
-extension BlurDirection.Evaluated {
+fileprivate extension BlurDirection.Evaluated {
     var unitPoints: (UnitPoint, UnitPoint) {
         switch self {
         case .down:
