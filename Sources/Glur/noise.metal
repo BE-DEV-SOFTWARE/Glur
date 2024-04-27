@@ -46,7 +46,7 @@ float rand(float2 st) {
                              float offset,
                              float interpolation,
                              float direction,
-                              float2 size) {
+                             float2 size) {
     float s = mapStrength(position,
                         size,
                         offset,
@@ -56,8 +56,8 @@ float rand(float2 st) {
     
     float2 pos = position*10;
     float2 floored = floor(pos);
-    float white = rand(floored);
     
+    float white = rand(floored)*0.5+0.5;
     half4 color = layer.sample(float2(position.x, position.y));
     
     float r = overlay(color.r, white);
