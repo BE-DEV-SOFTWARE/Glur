@@ -15,7 +15,7 @@ float mapStrength(float2 position,
                 float interpolation,
                 float strength,
                 float direction) {
-    float mapped;
+    float mapped = 0.0;
     
     if (direction == 0) {
         mapped = max((position.y/size.y-offset)/interpolation, 0.0);

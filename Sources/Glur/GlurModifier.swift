@@ -55,21 +55,26 @@ internal struct GlurModifier: ViewModifier {
         return shader
     }
     
+    @ViewBuilder
     public func body(content: Content) -> some View {
-        content
-            .drawingGroup()
-            .overlay {
-                GeometryReader { proxy in
-                    Color.clear
-                        .preference(key: SizePreferenceKey.self, value: proxy.size)
+        if radius == 0.0 {
+            content
+        } else {
+            content
+                .drawingGroup()
+                .overlay {
+                    GeometryReader { proxy in
+                        Color.clear
+                            .preference(key: SizePreferenceKey.self, value: proxy.size)
+                    }
                 }
-            }
-            .onPreferenceChange(SizePreferenceKey.self) { size in
-                self.size = size
-            }
-            .layerEffect(blurX, maxSampleOffset: .zero)
-            .layerEffect(blurY, maxSampleOffset: .zero)
-            .layerEffect(noiseShader, maxSampleOffset: .zero)
+                .onPreferenceChange(SizePreferenceKey.self) { size in
+                    self.size = size
+                }
+                .layerEffect(blurX, maxSampleOffset: .zero)
+                .layerEffect(blurY, maxSampleOffset: .zero)
+                .layerEffect(noiseShader, maxSampleOffset: .zero)
+        }
     }
 }
 

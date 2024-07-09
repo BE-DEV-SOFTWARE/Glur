@@ -19,20 +19,25 @@ internal struct CompatibilityModifier: ViewModifier {
         direction.evaluate(with: layoutDirection)
     }
     
+    @ViewBuilder
     func body(content: Content) -> some View {
-        content
-            .overlay {
-                content
-                    .drawingGroup()
-                    .allowsHitTesting(false)
-                    .blur(radius: radius)
-                    .scaleEffect(1+(radius*0.02))
-                    .mask(gradientMask)
-            }
+        if radius == 0.0 {
+            content
+        } else {
+            content
+                .overlay {
+                    content
+                        .drawingGroup()
+                        .allowsHitTesting(false)
+                        .blur(radius: radius)
+                        .scaleEffect(1+(radius*0.02))
+                        .mask(gradientMask)
+                }
+        }
     }
     
     var gradientMask: some View {
-        var (startPoint, endPoint) = evaluatedDirection.unitPoints
+        let (startPoint, endPoint) = evaluatedDirection.unitPoints
         
         return LinearGradient(stops: [
             .init(color: .clear, location: 0),
