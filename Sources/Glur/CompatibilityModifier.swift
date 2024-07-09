@@ -21,7 +21,7 @@ internal struct CompatibilityModifier: ViewModifier {
     
     @ViewBuilder
     func body(content: Content) -> some View {
-        if radius == 0.0 {
+        if radius.isZero {
             content
         } else {
             content

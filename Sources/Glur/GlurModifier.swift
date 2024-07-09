@@ -57,7 +57,7 @@ internal struct GlurModifier: ViewModifier {
     
     @ViewBuilder
     public func body(content: Content) -> some View {
-        if radius == 0.0 {
+        if radius.isZero {
             content
         } else {
             content
