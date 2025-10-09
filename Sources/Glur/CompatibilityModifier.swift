@@ -12,6 +12,7 @@ internal struct CompatibilityModifier: ViewModifier {
     public var offset: CGFloat
     public var interpolation: CGFloat
     public var direction: BlurDirection
+    public var drawingGroup: Bool
     
     @Environment(\.layoutDirection) var layoutDirection
     
@@ -26,12 +27,18 @@ internal struct CompatibilityModifier: ViewModifier {
         } else {
             content
                 .overlay {
-                    content
-                        .drawingGroup()
-                        .allowsHitTesting(false)
-                        .blur(radius: radius)
-                        .scaleEffect(1+(radius*0.02))
-                        .mask(gradientMask)
+                    Group {
+                        if drawingGroup {
+                            content
+                                .drawingGroup()
+                        } else {
+                            content
+                        }
+                    }
+                    .allowsHitTesting(false)
+                    .blur(radius: radius)
+                    .scaleEffect(1+(radius*0.02))
+                    .mask(gradientMask)
                 }
         }
     }

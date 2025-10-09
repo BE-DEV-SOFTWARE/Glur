@@ -16,11 +16,13 @@ extension View {
     ///   - interpolation: The distance from the offset to where the effect is fully applied, relative to the view's size.
     ///   - direction: The direction in which the effect is applied.
     ///   - noise: The amount of noise that should be applied to the view.
+    ///   - drawingGroup: Whether or not to pre-render the modified view with `drawingGroup()`
     public func glur(radius: CGFloat = 8.0,
                      offset: CGFloat = 0.3,
                      interpolation: CGFloat = 0.4,
                      direction: BlurDirection = .down,
-                     noise: CGFloat = 0.1) -> some View {
+                     noise: CGFloat = 0.1,
+                     drawingGroup: Bool = true) -> some View {
         assert(radius >= 0.0, "Radius must be greater than or equal to 0")
         assert(offset >= 0.0 && offset <= 1.0, "Offset must be between 0 and 1")
         assert(interpolation >= 0.0 && interpolation <= 1.0, "Interpolation must be between 0 and 1")
@@ -31,12 +33,14 @@ extension View {
                                          offset: offset,
                                          interpolation: interpolation,
                                          direction: direction,
-                                         noise: noise))
+                                         noise: noise,
+                                         drawingGroup: drawingGroup))
         } else {
             return modifier(CompatibilityModifier(radius: radius,
                                                   offset: offset,
                                                   interpolation: interpolation,
-                                                  direction: direction))
+                                                  direction: direction,
+                                                  drawingGroup: drawingGroup))
         }
     }
 }

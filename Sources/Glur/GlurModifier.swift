@@ -14,6 +14,7 @@ internal struct GlurModifier: ViewModifier {
     public var interpolation: CGFloat
     public var direction: BlurDirection
     public var noise: CGFloat
+    public var drawingGroup: Bool
     
     @State var size: CGSize = .zero
     
@@ -60,20 +61,26 @@ internal struct GlurModifier: ViewModifier {
         if radius.isZero {
             content
         } else {
-            content
-                .drawingGroup()
-                .overlay {
-                    GeometryReader { proxy in
-                        Color.clear
-                            .preference(key: SizePreferenceKey.self, value: proxy.size)
-                    }
+            Group {
+                if drawingGroup {
+                    content.drawingGroup()
+                } else {
+                    content
                 }
-                .onPreferenceChange(SizePreferenceKey.self) { size in
-                    self.size = size
+            }
+            .overlay {
+                GeometryReader { proxy in
+                    Color.clear
+                        .preference(key: SizePreferenceKey.self, value: proxy.size)
                 }
-                .layerEffect(blurX, maxSampleOffset: .zero)
-                .layerEffect(blurY, maxSampleOffset: .zero)
-                .layerEffect(noiseShader, maxSampleOffset: .zero)
+                .allowsHitTesting(false)
+            }
+            .onPreferenceChange(SizePreferenceKey.self) { size in
+                self.size = size
+            }
+            .layerEffect(blurX, maxSampleOffset: .zero)
+            .layerEffect(blurY, maxSampleOffset: .zero)
+            .layerEffect(noiseShader, maxSampleOffset: .zero)
         }
     }
 }

@@ -32,6 +32,7 @@ struct ContentView: View {
             #endif
             .padding(.vertical)
         }
+        .preferredColorScheme(.dark)
     }
     
     var icon: some View {
