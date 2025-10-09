@@ -16,7 +16,7 @@ extension View {
     ///   - interpolation: The distance from the offset to where the effect is fully applied, relative to the view's size.
     ///   - direction: The direction in which the effect is applied.
     ///   - noise: The amount of noise that should be applied to the view.
-    ///   - drawingGroup: Whether or not to pre-render the modified view with `drawingGroup()`
+    ///   - drawingGroup: Whether or not to pre-render the modified view with `drawingGroup()`.
     public func glur(radius: CGFloat = 8.0,
                      offset: CGFloat = 0.3,
                      interpolation: CGFloat = 0.4,
