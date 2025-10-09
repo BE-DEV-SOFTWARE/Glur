@@ -40,7 +40,9 @@ Here are all optional parameters:
 .glur(radius: 8.0, // The total radius of the blur effect when fully applied.
       offset: 0.3, // The distance from the view's edge to where the effect begins, relative to the view's size.
       interpolation: 0.4, // The distance from the offset to where the effect is fully applied, relative to the view's size.
-      direction: .down // The direction in which the effect is applied.
+      direction: .down, // The direction in which the effect is applied.
+      noise: 0.1, // The amount of noise that should be applied to the view.
+      drawingGroup: true // Whether or not to pre-render the modified view with `drawingGroup()`.
 )
 ```
 
