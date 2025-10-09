@@ -16,18 +16,17 @@ float mapRadius(float2 position,
                 float offset,
                 float interpolation,
                 float radius,
-                float direction,
-                float displayScale) {
-    float mapped;
+                float direction) {
+    float mapped = 0.0;
     
     if (direction == 0) {
-        mapped = max((position.y/size.y*displayScale-offset)/interpolation, 0.0);
+        mapped = max((position.y/size.y-offset)/interpolation, 0.0);
     } else if (direction == 1) {
-        mapped = max(0.5-(position.y/size.y*displayScale-offset)/interpolation, 0.0);
+        mapped = max(0.5-(position.y/size.y-offset)/interpolation, 0.0);
     } else if (direction == 2) {
-        mapped = max((position.x/size.x*displayScale-offset)/interpolation, 0.0);
+        mapped = max((position.x/size.x-offset)/interpolation, 0.0);
     } else if (direction == 3) {
-        mapped = max(0.5-(position.x/size.x*displayScale-offset)/interpolation, 0.0);
+        mapped = max(0.5-(position.x/size.x-offset)/interpolation, 0.0);
     }
     
     return min(mapped*radius, radius);
@@ -54,13 +53,13 @@ void calculateGaussianWeights(float radius,
                              float offset,
                              float interpolation,
                              float direction,
-                             float displayScale) {
+                             float2 size) {
     float r = mapRadius(position,
-                        float2(layer.tex.get_width(), layer.tex.get_height()),
-                        offset, interpolation,
+                        size,
+                        offset,
+                        interpolation,
                         radius,
-                        direction,
-                        displayScale);
+                        direction);
     
     if (r == 0) {
         return layer.sample(position);
@@ -72,7 +71,7 @@ void calculateGaussianWeights(float radius,
     half4 result = half4(0.0);
     for (int i = 0; i < kernelSize; ++i) {
         float offset = i-(kernelSize-1)/2;
-        float x = clamp(position.x+offset, 0.0, layer.tex.get_width()-1.0);
+        float x = clamp(position.x+offset, 0.0, size.x-1.0);
         
         result+= layer.sample(float2(x, position.y))*weights[i];
     }
@@ -86,13 +85,13 @@ void calculateGaussianWeights(float radius,
                              float offset,
                              float interpolation,
                              float direction,
-                             float displayScale) {
+                             float2 size) {
     float r = mapRadius(position,
-                        float2(layer.tex.get_width(), layer.tex.get_height()),
-                        offset, interpolation,
+                        size,
+                        offset,
+                        interpolation,
                         radius,
-                        direction,
-                        displayScale);
+                        direction);
     
     if (r == 0) {
         return layer.sample(position);
@@ -104,7 +103,7 @@ void calculateGaussianWeights(float radius,
     half4 result = half4(0.0);
     for (int i = 0; i < kernelSize; ++i) {
         float offset = i-(kernelSize-1)/2;
-        float y = clamp(position.y+offset, 0.0, layer.tex.get_height()-1.0);
+        float y = clamp(position.y+offset, 0.0, size.y-1.0);
         
         result+= layer.sample(float2(position.x, y))*weights[i];
     }
