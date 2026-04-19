@@ -1,66 +1,69 @@
-<h1> Glur
-  <img align="right" alt="Project logo" src="../assets/Icon.png" width=128px>
-</h1>
+# Glur
 
-<p>
-    <img src="https://img.shields.io/badge/iOS-15.0+-FF4D00.svg" />
-    <img src="https://img.shields.io/badge/macOS-12.0+-FF4D00.svg" />
-    <img src="https://img.shields.io/badge/watchOS-8.0+-FF4D00.svg" />
-    <img src="https://img.shields.io/badge/tvOS-15.0+-FF4D00.svg" />
-    <img src="https://img.shields.io/badge/visionOS-1.0+-FF4D00.svg" />
-    <br>
-    <img src="https://img.shields.io/badge/-SwiftUI-FF9F00.svg" />
-    <a href="https://twitter.com/joogps">
-        <img src="https://img.shields.io/badge/Contact-@joogps-lightgrey.svg?style=social&logo=twitter" alt="Twitter: @joogps" />
-    </a>
-</p>
-
-A SwiftUI library that uses Metal to display efficient progressive blurs, just like the ones used by Apple. No **CIFilter**, and no **private APIs** used.(https://apps.apple.com/app/glur/id6478063257).
-
-<img width="1280" alt="A comparison of Glur and a simple masked material" src="https://github.com/joogps/Glur/assets/41346220/1c748b09-a8e4-4782-a250-8563f106f298">
+A small SwiftUI package for **beautiful progressive blur** on your views. It uses **Metal** (no **CIFilter**, no **private APIs**) and exposes a **simple, SwiftUI-first API**: a `UnitPoint` anchor, sizes in **points**, and one modifier—`.glur(...)`.
 
 ## Installation
-This repository is a Swift package, so just include it in your Xcode project and target under **File > Add package dependencies**. Then, `import Glur` to the Swift files where you'll be using it.
+
+Add the package in Xcode (**File → Add Package Dependencies…**), then `import Glur`.
 
 > [!NOTE]  
-> While Glur is supported on older platforms, it will only utilize the Metal implementation of the blur effect on **iOS 17.0 and later, macOS 14.0 and later, and tvOS 17.0 and later**. Otherwise, it will present a worse, compatibility effect that should be tested by the developer before being used in production.
-> 
-> **The Metal implementation is not available on watchOS**, and therefore the compatibility effect will be presented on this platform by default.
+> The Metal path is used on **iOS 17+**, **macOS 14+**, and **tvOS 17+**. Older OS versions use a simpler compatibility blur. **watchOS** always uses the compatibility path.
 
-## Usage
-You can add a glur effect with the following modifier:
+## API (`View.glur`)
+
+
+| Parameter         | Required            | Description                                                                                                                     |
+| ----------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `startingPoint`   | yes                 | `UnitPoint` anchor on the layer: `(x * layerWidth, y * layerHeight)` in points (`x`/`y` may be outside 0…1; result is clipped). |
+| `direction`       | yes                 | `GlurDirection`: how the `width` × `height` rectangle is placed from that anchor (see below).                                   |
+| `width`, `height` | yes                 | Non-negative **points** for the blur region, relative to the **same** view the modifier measures.                               |
+| `radius`          | no (default `8`)    | Blur strength inside the region.                                                                                                |
+| `spread`          | no (default `0.07`) | Edge softness in normalized layer space (`0` = sharp; larger = softer transition).                                              |
+| `noise`           | no (default `0.1`)  | Grain inside the blurred region.                                                                                                |
+| `drawingGroup`    | no (default `true`) | Use `drawingGroup()` before the shader path.                                                                                    |
+
+
+### `GlurDirection`
+
+- `**.center`** — region centered on the anchor.  
+- `**.up` / `.down**` — anchor on the bottom or top **edge midpoint**; grows up or down; `width` centered on `x`.  
+- `**.left` / `.right`** — anchor on the right or left **edge midpoint**; grows sideways; `height` centered on `y`.  
+- `.upLeft` **/** `.upRight` **/** `.downLeft` **/** `.downRight` — corner-anchored rectangles.
+
+### Examples
 
 ```swift
-.glur()
-```
-
-Here are all optional parameters:
-
-```swift
-.glur(radius: 8.0, // The total radius of the blur effect when fully applied.
-      offset: 0.3, // The distance from the view's edge to where the effect begins, relative to the view's size.
-      interpolation: 0.4, // The distance from the offset to where the effect is fully applied, relative to the view's size.
-      direction: .down, // The direction in which the effect is applied.
-      noise: 0.1, // The amount of noise that should be applied to the view.
-      drawingGroup: true // Whether or not to pre-render the modified view with `drawingGroup()`.
+.glur(
+    startingPoint: UnitPoint(x: 0.5, y: 0.7),
+    direction: .down,
+    width: 320,
+    height: 96
 )
+
+.glur(startingPoint: .center, direction: .center, width: 400, height: 300)
+
+.glur(startingPoint: .bottomTrailing, direction: .downRight, width: 200, height: 120)
 ```
 
 > [!WARNING]  
-> When being used in the iOS simulator, SwiftUI shader effects may not be displayed if the view exceeds 545 points in either dimension. Please note that, on a physical device, the effect should work as intented. 
+> In the **iOS Simulator**, SwiftUI layer shaders may not appear if the layer is larger than **~545 pt** on an edge; devices are usually fine.
 
-## How it's done
+## How it works
 
-This project builds on a [proof of concept](https://twitter.com/joogps/status/1667240291869270032) developed in June of 2023, right after WWDC.
+Metal stitchable blur + optional noise via SwiftUI’s **Shader** API. Blur strength follows a soft **rectangle** in the shader (with `spread` for the edge falloff). Works best on pure SwiftUI content; see Apple’s Shader/layer limitations.
 
-It makes use of Apple's new simplified [Shader API for SwiftUI](https://developer.apple.com/documentation/swiftui/shader). First, I coded a Metal shader that produced a gaussian blur for the modified view with the correct gaussian weights distribution, efficiently. Then, I modified it slightly to vary the blur radius over the vertical or horizontal axis given the offset, interpolation and direction values.
+- [Original proof of concept](https://twitter.com/joogps/status/1667240291869270032)  
+- [Shader API](https://developer.apple.com/documentation/swiftui/shader)  
+- [Metal + SwiftUI tutorial (Cindori)](https://cindori.com/developer/swiftui-shaders-wave)
 
-> [!WARNING]
-> Given that the shader is applied through Apple's own Shader API for SwiftUI, it is restricted by the limitations imposed by that API. This means that Glur **can only be applied to pure SwiftUI views**, excluding UIKit-backed views, such as `ScrollView`.
+## Demo
 
-> [!TIP]
-> If you want to learn how to write your first Metal shader with SwiftUI, check out [this tutorial](https://cindori.com/developer/swiftui-shaders-wave) that I wrote for the [Cindori](https://cindori.com) blog.
+Open **GlurDemo** in Xcode and run it on a simulator or device.
 
-# Demo
+---
 
-You can run a demo of Glur in your device or simulator through the **GlurDemo** project in this repository.
+## Fork & maintainer
+
+This repository is a **fork** of [Glur](https://github.com/joogps/Glur) by **João Gabriel Pozzobon dos Santos**. It keeps the same spirit—fast, good-looking progressive blur—while extending placement (e.g. `UnitPoint`, point sizes, corners, and `spread`) for more control over *where* the blur appears.
+
+Maintained by Jonathan Bereyziat from **[Be-Dev](https://be-dev.ch)** · [jonathan@be-dev.ch](mailto:jonathan@be-dev.ch)
